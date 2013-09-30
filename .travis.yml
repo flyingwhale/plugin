@@ -1,0 +1,16 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+before_script:
+  - php --info
+  - composer install --dev
+
+script:
+  - vendor/bin/phpunit --verbose
+
+after_script:
+  - php vendor/bin/coveralls -v
