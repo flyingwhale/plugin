@@ -25,34 +25,62 @@ class PluginRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testAddPlugin()
     {
-        $plugin1 = m::mock('plugin',array('pluginInit'=>null,'getPluginName'=>'name','isPluginMultipleInstanced'=>false));
-        $plugin1Delta = m::mock('plugin',array('pluginInit'=>null,'getPluginName'=>'name','isPluginMultipleInstanced'=>false));
-        $plugin2 = m::mock('plugin',array('pluginInit'=>null,'getPluginName'=>'name1','isPluginMultipleInstanced'=>false));
-
         $pluginRegistry = new PluginRegistry();
+
+        $plugin1Name = 'plugin_1';
+        $plugin1 = m::mock('plugin', array('Init' => null, 'getName' => $plugin1Name, 'isMultipleInstanced' => false));
+
+        $plugin2Name = 'plugin_2';
+        $plugin2 = m::mock('plugin', array('Init' => null, 'getName' => $plugin2Name, 'isMultipleInstanced' => false));
+
         $pluginRegistry->addPlugin($plugin1);
+        $this->assertEquals($plugin1, $pluginRegistry->getPlugin($plugin1Name));
+
         $pluginRegistry->addPlugin($plugin2);
-
-        $this->setExpectedException('FlyingWhale\Plugin\Exceptions\MultipleSameTypePluginRegistrationException');
-
-        $pluginRegistry->addPlugin($plugin1Delta);
-
+        $this->assertEquals($plugin2, $pluginRegistry->getPlugin($plugin2Name));
     }
-    public function testGetPlugin()
+
+    public function testAddPluginException()
     {
         $pluginRegistry = new PluginRegistry();
-        $plugin = m::mock('plugin',array('init'=>null,'getPluginName'=>'name','isPluginMultipleInstanced'=>false));
+
+        $pluginName = 'plugin_1';
+        $plugin = m::mock('plugin', array('Init' => null, 'getName' => $pluginName, 'isMultipleInstanced' => false));
+        $sameTypePlugin = m::mock('plugin', array('Init' => null, 'getName' => $pluginName, 'isMultipleInstanced' => false));
 
         $pluginRegistry->addPlugin($plugin);
 
-        $pluginRegistry->getPlugin('name');
+        $this->setExpectedException('FlyingWhale\Plugin\Exceptions\MultipleSameTypePluginRegistrationException');
+        $pluginRegistry->addPlugin($sameTypePlugin);
+    }
 
+    /**
+     * @dataProvider provider
+     */
+    public function testGetPlugin($pluginRegistry, $pluginName, $expectedPlugin)
+    {
+        $plugin = $pluginRegistry->getPlugin($pluginName);
+        $this->assertEquals($expectedPlugin, $plugin);
+    }
+
+    /**
+     * @dataProvider provider
+     */
+    public function testGetPluginException($pluginRegistry, $expectedPlugin)
+    {
         $this->setExpectedException('FlyingWhale\Plugin\Exceptions\PluginIsNotRegisteredException');
-        $pl = $pluginRegistry->getPlugin('noname');
+        $plugin = $pluginRegistry->getPlugin('not_registered_plugin');
+    }
 
-        $this->assertEquals($plugin->getName(), $pl->getName());
+    public function provider()
+    {
+        $pluginName = 'plugin';
+        $plugin = m::mock('plugin', array('init' => null, 'getName' => $pluginName, 'isMultipleInstanced' => false));
+        $pluginRegistry = new PluginRegistry();
+        $pluginRegistry->addPlugin($plugin);
 
-        $pluginRegistry->getPlugin('noname');
-
+        return array(
+            array($pluginRegistry, $pluginName, $plugin)
+        );
     }
 }

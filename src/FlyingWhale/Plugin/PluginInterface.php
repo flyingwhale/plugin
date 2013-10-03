@@ -17,15 +17,15 @@ Interface PluginInterface
 /**
  * @param PluginContainer $pluginContainer
  */
-  public function pluginInit($pluginContainer);
+  public function Init($pluginContainer);
 
   /**
    * @return String
    */
-  public function getPluginName();
+  public function getName();
 
   /**
    * @return boolean
    */
-  public function isPluginMultipleInstanced();
+  public function isMultipleInstanced();
 }
