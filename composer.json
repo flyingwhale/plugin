@@ -24,7 +24,6 @@
         "psr-0": { "FlyingWhale\\Plugin\\": "src/" }
     },
 
-    "bin": ["bin/console"],
     "minimum-stability": "dev" ,
     "process-timeout": "3600"
 }
